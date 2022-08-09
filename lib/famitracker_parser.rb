@@ -28,7 +28,8 @@ module FamitrackerParser
   end
 
   def self.playground
-    parser = Parser.new(::File.read("spec/fixtures/famitracker-export.txt"))
+    content = File.open("spec/fixtures/famitracker-export.txt", "r:iso-8859-1:utf-8", &:read)
+    parser = Parser.new(content)
     result = parser.parse!
     require "pry"
     binding.pry
