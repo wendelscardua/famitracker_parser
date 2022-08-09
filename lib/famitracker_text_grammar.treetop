@@ -1,0 +1,37 @@
+require 'famitracker_parser/file'
+
+grammar FamitrackerTextGrammar
+  rule file
+    file_description
+    linebreak
+    etc
+    {
+      def structure
+        FamitrackerParser::File.new(
+          description: file_description.structure,
+          etc: etc.structure
+        )
+      end
+    }
+  end
+
+  rule linebreak
+    "\r\n"
+  end
+
+  rule file_description
+    "# " program:([^\s]*) " text export " version:([^\r\n]*) linebreak {
+      def structure
+        FamitrackerParser::FileDescription.new(program: program.text_value, version: version.text_value)
+      end
+    }
+  end
+
+  rule etc
+    everything:(.+) {
+      def structure
+        text_value
+      end
+    }
+  end
+end
