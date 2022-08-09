@@ -4,11 +4,13 @@ grammar FamitrackerTextGrammar
   rule song
     export_description linebreak
     song_information linebreak
+    song_comment linebreak
     etc {
       def value
         FamitrackerParser::Song.new(
           export_description: export_description.value,
-          song_information: song_information.value
+          song_information: song_information.value,
+          song_comment: song_comment.value
         )
       end
     }
@@ -36,6 +38,15 @@ grammar FamitrackerTextGrammar
           author: author.value,
           copyright: copyright.value
         )
+      end
+    }
+  end
+
+  rule song_comment
+    "# Song comment" linebreak
+    "COMMENT" spaces comment:string linebreak {
+      def value
+        FamitrackerParser::SongComment.new(comment: comment.value)
       end
     }
   end
