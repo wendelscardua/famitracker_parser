@@ -5,19 +5,23 @@ grammar FamitrackerTextGrammar
     export_description linebreak
     song_information linebreak
     song_comment linebreak
-    etc {
+    global_settings linebreak
+    etc
+    {
       def value
         FamitrackerParser::Song.new(
           export_description: export_description.value,
           song_information: song_information.value,
-          song_comment: song_comment.value
+          song_comment: song_comment.value,
+          global_settings: global_settings.value
         )
       end
     }
   end
 
   rule export_description
-    "# " program:([^\s]*) " text export " version:([^\r\n]*) linebreak {
+    "# " program:([^\s]*) " text export " version:([^\r\n]*) linebreak
+    {
       def value
         FamitrackerParser::ExportDescription.new(
           program: program.text_value,
@@ -31,7 +35,8 @@ grammar FamitrackerTextGrammar
     "# Song information" linebreak
     "TITLE" spaces title:string linebreak
     "AUTHOR" spaces author:string linebreak
-    "COPYRIGHT" spaces copyright:string linebreak {
+    "COPYRIGHT" spaces copyright:string linebreak
+    {
       def value
         FamitrackerParser::SongInformation.new(
           title: title.value,
@@ -44,9 +49,30 @@ grammar FamitrackerTextGrammar
 
   rule song_comment
     "# Song comment" linebreak
-    "COMMENT" spaces comment:string linebreak {
+    "COMMENT" spaces comment:string linebreak
+    {
       def value
         FamitrackerParser::SongComment.new(comment: comment.value)
+      end
+    }
+  end
+
+  rule global_settings
+    "# Global settings" linebreak
+    "MACHINE" spaces machine:integer linebreak
+    "FRAMERATE" spaces framerate:integer linebreak
+    "EXPANSION" spaces expansion:integer linebreak
+    "VIBRATO" spaces vibrato:integer linebreak
+    "SPLIT" spaces split:integer linebreak
+    {
+      def value
+        FamitrackerParser::GlobalSettings.new(
+          machine: machine.value,
+          framerate: framerate.value,
+          expansion: expansion.value,
+          vibrato: vibrato.value,
+          split: split.value
+        )
       end
     }
   end
@@ -60,15 +86,35 @@ grammar FamitrackerTextGrammar
   end
 
   rule string
-    '"' string_value:(('\"' / !'"' .)*) '"' {
+    '"' string_value:(('\"' / !'"' .)*) '"'
+    {
       def value
         string_value.text_value
       end
     }
   end
 
+  rule integer
+    [-]? [0-9]+
+    {
+      def value
+        text_value.to_i
+      end
+    }
+  end
+
+  rule hexadecimal_byte
+    [0-9A-F] [0-9A-F]
+    {
+      def value
+        text_value.to_i(16)
+      end
+    }
+  end
+
   rule etc
-    everything:(.+) {
+    everything:(.+)
+    {
       def value
         text_value
       end

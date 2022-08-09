@@ -4,14 +4,17 @@ module FamitrackerParser
   class Song
     attr_reader :export_description,
                 :song_information,
-                :song_comment
+                :song_comment,
+                :global_settings
 
     def initialize(export_description:,
                    song_information:,
-                   song_comment:)
+                   song_comment:,
+                   global_settings:)
       @export_description = export_description
       @song_information = song_information
       @song_comment = song_comment
+      @global_settings = global_settings
     end
   end
 
@@ -39,6 +42,26 @@ module FamitrackerParser
 
     def initialize(comment:)
       @comment = comment
+    end
+  end
+
+  class GlobalSettings
+    attr_reader :machine,
+                :framerate,
+                :expansion,
+                :vibrato,
+                :split
+
+    def initialize(machine:,
+                   framerate:,
+                   expansion:,
+                   vibrato:,
+                   split:)
+      @machine = machine
+      @framerate = framerate
+      @expansion = expansion
+      @vibrato = vibrato
+      @split = split
     end
   end
 end
