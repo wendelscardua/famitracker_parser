@@ -1,15 +1,40 @@
-require 'famitracker_parser/file'
+require 'famitracker_parser/song'
 
 grammar FamitrackerTextGrammar
-  rule file
-    file_description
-    linebreak
-    etc
-    {
-      def structure
-        FamitrackerParser::File.new(
-          description: file_description.structure,
-          etc: etc.structure
+  rule song
+    export_description linebreak
+    song_information linebreak
+    etc {
+      def value
+        FamitrackerParser::Song.new(
+          export_description: export_description.value,
+          song_information: song_information.value
+        )
+      end
+    }
+  end
+
+  rule export_description
+    "# " program:([^\s]*) " text export " version:([^\r\n]*) linebreak {
+      def value
+        FamitrackerParser::ExportDescription.new(
+          program: program.text_value,
+          version: version.text_value
+        )
+      end
+    }
+  end
+
+  rule song_information
+    "# Song information" linebreak
+    "TITLE" spaces title:string linebreak
+    "AUTHOR" spaces author:string linebreak
+    "COPYRIGHT" spaces copyright:string linebreak {
+      def value
+        FamitrackerParser::SongInformation.new(
+          title: title.value,
+          author: author.value,
+          copyright: copyright.value
         )
       end
     }
@@ -19,17 +44,21 @@ grammar FamitrackerTextGrammar
     "\r\n"
   end
 
-  rule file_description
-    "# " program:([^\s]*) " text export " version:([^\r\n]*) linebreak {
-      def structure
-        FamitrackerParser::FileDescription.new(program: program.text_value, version: version.text_value)
+  rule spaces
+    [\s]+
+  end
+
+  rule string
+    '"' string_value:(('\"' / !'"' .)*) '"' {
+      def value
+        string_value.text_value
       end
     }
   end
 
   rule etc
     everything:(.+) {
-      def structure
+      def value
         text_value
       end
     }

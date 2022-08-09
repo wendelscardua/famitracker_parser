@@ -15,7 +15,7 @@ module FamitrackerParser
     end
 
     def parse
-      @grammar_parser.parse(@source).structure
+      @grammar_parser.parse(@source)&.value
     end
 
     def parse!
