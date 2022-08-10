@@ -28,7 +28,7 @@ module FamitrackerParser
   end
 
   def self.playground
-    content = File.open("spec/fixtures/famitracker-export.txt", "r:iso-8859-1:utf-8", &:read)
+    content = File.open("spec/fixtures/2a03-example.txt", "r:iso-8859-1:utf-8", &:read)
     parser = Parser.new(content)
     result = parser.parse!
     require "pry"

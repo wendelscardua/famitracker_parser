@@ -6,7 +6,8 @@ module FamitrackerParser
                   :song_information,
                   :song_comment,
                   :global_settings,
-                  :macros
+                  :macros,
+                  :dpcm_samples
   end
 
   class ExportDescription
@@ -71,5 +72,12 @@ module FamitrackerParser
       when 2 then "Relative"
       end
     end
+  end
+
+  class DPCMSample
+    attr_accessor :id,
+                  :size,
+                  :name,
+                  :bytes
   end
 end

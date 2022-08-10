@@ -7,6 +7,7 @@ grammar FamitrackerTextGrammar
     song_comment linebreak
     global_settings linebreak
     macros linebreak
+    dpcm_samples linebreak
     etc
     {
       def value
@@ -16,6 +17,7 @@ grammar FamitrackerTextGrammar
           song.song_comment = song_comment.value
           song.global_settings = global_settings.value
           song.macros = macros.value
+          song.dpcm_samples = dpcm_samples.value
         end
       end
     }
@@ -113,6 +115,31 @@ grammar FamitrackerTextGrammar
           macro.release_index = release_index.value
           macro.arpeggio_type = arpeggio_type.value
           macro.values = values.elements.map(&:integer).map(&:value)
+        end
+      end
+    }
+  end
+
+  rule dpcm_samples
+    "# DPCM samples" linebreak
+    dpcm_samples:(dpcm_sample)*
+    {
+      def value
+        dpcm_samples.elements.map(&:value)
+      end
+    }
+  end
+
+  rule dpcm_sample
+    "DPCMDEF" spaces id:integer spaces size:integer spaces name:string linebreak
+    dpcm_bytes:("DPCM" spaces ":" bytes:(spaces byte:hexadecimal_byte)+ linebreak)*
+    {
+      def value
+        FamitrackerParser::DPCMSample.new.tap do |dpcm_sample|
+          dpcm_sample.id = id.value
+          dpcm_sample.size = size.value
+          dpcm_sample.name = name.value
+          dpcm_sample.bytes = dpcm_bytes.elements.flat_map(&:bytes).flat_map(&:elements).flat_map(&:byte).map(&:value)
         end
       end
     }
