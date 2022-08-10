@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "famitracker_parser"
+require "rspec/file_fixtures"
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure
