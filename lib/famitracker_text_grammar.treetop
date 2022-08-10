@@ -167,7 +167,7 @@ grammar FamitrackerTextGrammar
     spaces duty_noise_macro:integer
     spaces name:string
     linebreak
-    dpcm_keys:("KEYDPCM" (spaces integer)* linebreak)*
+    dpcm_keys:(dpcm_keys)*
     {
       def value
         FamitrackerParser::Instrument.new.tap do |instrument|
@@ -179,7 +179,32 @@ grammar FamitrackerTextGrammar
           instrument.hi_pitch_macro = hi_pitch_macro.value
           instrument.duty_noise_macro = duty_noise_macro.value
           instrument.name = name.value
-          instrument.dpcm_keys = dpcm_keys.elements.map(&:text_value)
+          instrument.dpcm_keys = dpcm_keys.elements.map(&:value)
+        end
+      end
+    }
+  end
+
+  rule dpcm_keys
+    "KEYDPCM"
+    spaces instrument_id:integer
+    spaces octave:integer
+    spaces note:integer
+    spaces dpcm_sample_id:integer
+    spaces pitch:integer
+    spaces loop:integer
+    spaces "0"
+    spaces d_counter:integer
+    linebreak
+    {
+      def value
+        FamitrackerParser::DPCMKey.new.tap do |dpcm_key|
+          dpcm_key.octave = octave.value
+          dpcm_key.note = note.value
+          dpcm_key.dpcm_sample_id = dpcm_sample_id.value
+          dpcm_key.pitch = pitch.value
+          dpcm_key.loop = loop.value
+          dpcm_key.d_counter = d_counter.value
         end
       end
     }

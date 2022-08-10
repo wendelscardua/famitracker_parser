@@ -93,4 +93,13 @@ module FamitrackerParser
                   :name,
                   :dpcm_keys
   end
+
+  class DPCMKey
+    attr_accessor :octave,
+                  :note,
+                  :dpcm_sample_id,
+                  :pitch,
+                  :loop,
+                  :d_counter
+  end
 end
