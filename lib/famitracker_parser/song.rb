@@ -7,7 +7,8 @@ module FamitrackerParser
                   :song_comment,
                   :global_settings,
                   :macros,
-                  :dpcm_samples
+                  :dpcm_samples,
+                  :instruments
   end
 
   class ExportDescription
@@ -79,5 +80,17 @@ module FamitrackerParser
                   :size,
                   :name,
                   :bytes
+  end
+
+  class Instrument
+    attr_accessor :type,
+                  :id,
+                  :volume_macro,
+                  :arpeggio_macro,
+                  :pitch_macro,
+                  :hi_pitch_macro,
+                  :duty_noise_macro,
+                  :name,
+                  :dpcm_keys
   end
 end

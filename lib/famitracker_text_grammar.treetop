@@ -8,6 +8,7 @@ grammar FamitrackerTextGrammar
     global_settings linebreak
     macros linebreak
     dpcm_samples linebreak
+    instruments linebreak
     etc
     {
       def value
@@ -18,6 +19,7 @@ grammar FamitrackerTextGrammar
           song.global_settings = global_settings.value
           song.macros = macros.value
           song.dpcm_samples = dpcm_samples.value
+          song.instruments = instruments.value
         end
       end
     }
@@ -140,6 +142,44 @@ grammar FamitrackerTextGrammar
           dpcm_sample.size = size.value
           dpcm_sample.name = name.value
           dpcm_sample.bytes = dpcm_bytes.elements.flat_map(&:bytes).flat_map(&:elements).flat_map(&:byte).map(&:value)
+        end
+      end
+    }
+  end
+
+  rule instruments
+    "# Instruments" linebreak
+    instruments:(instrument)*
+    {
+      def value
+        instruments.elements.map(&:value)
+      end
+    }
+  end
+
+  rule instrument
+    type:("INST2A03")
+    spaces id:integer
+    spaces volume_macro:integer
+    spaces arpeggio_macro:integer
+    spaces pitch_macro:integer
+    spaces hi_pitch_macro:integer
+    spaces duty_noise_macro:integer
+    spaces name:string
+    linebreak
+    dpcm_keys:("KEYDPCM" (spaces integer)* linebreak)*
+    {
+      def value
+        FamitrackerParser::Instrument.new.tap do |instrument|
+          instrument.type = type.text_value
+          instrument.id = id.value
+          instrument.volume_macro = volume_macro.value
+          instrument.arpeggio_macro = arpeggio_macro.value
+          instrument.pitch_macro = pitch_macro.value
+          instrument.hi_pitch_macro = hi_pitch_macro.value
+          instrument.duty_noise_macro = duty_noise_macro.value
+          instrument.name = name.value
+          instrument.dpcm_keys = dpcm_keys.elements.map(&:text_value)
         end
       end
     }
