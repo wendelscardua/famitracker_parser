@@ -9,12 +9,12 @@ grammar FamitrackerTextGrammar
     etc
     {
       def value
-        FamitrackerParser::Song.new(
-          export_description: export_description.value,
-          song_information: song_information.value,
-          song_comment: song_comment.value,
-          global_settings: global_settings.value
-        )
+        FamitrackerParser::Song.new.tap do |song|
+          song.export_description = export_description.value
+          song.song_information = song_information.value
+          song.song_comment = song_comment.value
+          song.global_settings = global_settings.value
+        end
       end
     }
   end
@@ -23,10 +23,10 @@ grammar FamitrackerTextGrammar
     "# " program:([^\s]*) " text export " version:([^\r\n]*) linebreak
     {
       def value
-        FamitrackerParser::ExportDescription.new(
-          program: program.text_value,
-          version: version.text_value
-        )
+        FamitrackerParser::ExportDescription.new.tap do |export_description|
+          export_description.program = program.text_value
+          export_description.version = version.text_value
+        end
       end
     }
   end
@@ -38,11 +38,11 @@ grammar FamitrackerTextGrammar
     "COPYRIGHT" spaces copyright:string linebreak
     {
       def value
-        FamitrackerParser::SongInformation.new(
-          title: title.value,
-          author: author.value,
-          copyright: copyright.value
-        )
+        FamitrackerParser::SongInformation.new.tap do |song_information|
+          song_information.title = title.value
+          song_information.author = author.value
+          song_information.copyright = copyright.value
+        end
       end
     }
   end
@@ -52,7 +52,7 @@ grammar FamitrackerTextGrammar
     "COMMENT" spaces comment:string linebreak
     {
       def value
-        FamitrackerParser::SongComment.new(comment: comment.value)
+        comment.value
       end
     }
   end
@@ -64,15 +64,22 @@ grammar FamitrackerTextGrammar
     "EXPANSION" spaces expansion:integer linebreak
     "VIBRATO" spaces vibrato:integer linebreak
     "SPLIT" spaces split:integer linebreak
+    n163_gs:(
+      linebreak "# Namco 163 global settings" linebreak
+      "N163CHANNELS" spaces n163_channels:integer linebreak
+    )?
     {
       def value
-        FamitrackerParser::GlobalSettings.new(
-          machine: machine.value,
-          framerate: framerate.value,
-          expansion: expansion.value,
-          vibrato: vibrato.value,
-          split: split.value
-        )
+        require "pry"
+        binding.pry
+        FamitrackerParser::GlobalSettings.new.tap do |global_settings|
+          global_settings.machine = machine.value
+          global_settings.framerate = framerate.value
+          global_settings.expansion = expansion.value
+          global_settings.vibrato = vibrato.value
+          global_settings.split = split.value
+          global_settings.n163_channels = n163_gs.n163_channels.value if n163_gs.elements
+        end
       end
     }
   end
