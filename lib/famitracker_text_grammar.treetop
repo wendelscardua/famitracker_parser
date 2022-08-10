@@ -9,7 +9,9 @@ grammar FamitrackerTextGrammar
     macros linebreak
     dpcm_samples linebreak
     instruments linebreak
-    etc
+    tracks
+    "# End of export"
+    linebreak
     {
       def value
         FamitrackerParser::Song.new.tap do |song|
@@ -20,6 +22,7 @@ grammar FamitrackerTextGrammar
           song.macros = macros.value
           song.dpcm_samples = dpcm_samples.value
           song.instruments = instruments.value
+          song.tracks = tracks.value
         end
       end
     }
@@ -210,6 +213,74 @@ grammar FamitrackerTextGrammar
     }
   end
 
+  rule tracks
+    "# Tracks" linebreak linebreak
+    tracks:(track)*
+    {
+      def value
+        tracks.elements.map(&:value)
+      end
+    }
+  end
+
+  rule track
+    "TRACK"
+    spaces rows:integer
+    spaces speed:integer
+    spaces tempo:integer
+    spaces name:string
+    linebreak
+    "COLUMNS" spaces ":" (spaces integer)* linebreak
+    linebreak
+    pattern_order:(order_row)*
+    linebreak
+    patterns:(pattern linebreak)*
+    {
+      def value
+        FamitrackerParser::Track.new.tap do |track|
+          track.rows = rows.value
+          track.speed = speed.value
+          track.tempo = tempo.value
+          track.name = name.value
+          track.pattern_order = pattern_order.elements.map(&:value)
+          track.patterns = patterns.elements.map(&:pattern).map(&:value)
+        end
+      end
+    }
+  end
+
+  rule order_row
+    "ORDER" spaces index:hexadecimal_byte spaces ":"
+    bytes:(spaces byte:hexadecimal_byte)* linebreak
+    {
+      def value
+        bytes.elements.map(&:byte).map(&:value)
+      end
+    }
+  end
+
+  rule pattern
+    "PATTERN" spaces id:hexadecimal_byte linebreak
+    rows:(row)*
+    {
+      def value
+        FamitrackerParser::Pattern.new.tap do |pattern|
+          pattern.id = id.value
+          pattern.rows = rows.elements.map(&:value)
+        end
+      end
+    }
+  end
+
+  rule row
+    "ROW" spaces id:hexadecimal_byte [^\r\n]* linebreak
+    {
+      def value
+        text_value
+      end
+    }
+  end
+
   rule linebreak
     "\r\n"
   end
@@ -241,15 +312,6 @@ grammar FamitrackerTextGrammar
     {
       def value
         text_value.to_i(16)
-      end
-    }
-  end
-
-  rule etc
-    everything:(.+)
-    {
-      def value
-        text_value
       end
     }
   end

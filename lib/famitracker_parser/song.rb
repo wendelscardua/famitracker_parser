@@ -8,7 +8,8 @@ module FamitrackerParser
                   :global_settings,
                   :macros,
                   :dpcm_samples,
-                  :instruments
+                  :instruments,
+                  :tracks
   end
 
   class ExportDescription
@@ -101,5 +102,19 @@ module FamitrackerParser
                   :pitch,
                   :loop,
                   :d_counter
+  end
+
+  class Track
+    attr_accessor :rows,
+                  :speed,
+                  :tempo,
+                  :name,
+                  :pattern_order,
+                  :patterns
+  end
+
+  class Pattern
+    attr_accessor :id,
+                  :rows
   end
 end
