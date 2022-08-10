@@ -6,6 +6,7 @@ grammar FamitrackerTextGrammar
     song_information linebreak
     song_comment linebreak
     global_settings linebreak
+    macros linebreak
     etc
     {
       def value
@@ -14,6 +15,7 @@ grammar FamitrackerTextGrammar
           song.song_information = song_information.value
           song.song_comment = song_comment.value
           song.global_settings = global_settings.value
+          song.macros = macros.value
         end
       end
     }
@@ -70,8 +72,6 @@ grammar FamitrackerTextGrammar
     )?
     {
       def value
-        require "pry"
-        binding.pry
         FamitrackerParser::GlobalSettings.new.tap do |global_settings|
           global_settings.machine = machine.value
           global_settings.framerate = framerate.value
@@ -79,6 +79,40 @@ grammar FamitrackerTextGrammar
           global_settings.vibrato = vibrato.value
           global_settings.split = split.value
           global_settings.n163_channels = n163_gs.n163_channels.value if n163_gs.elements
+        end
+      end
+    }
+  end
+
+  rule macros
+    "# Macros" linebreak
+    macros:(macro)*
+    {
+      def value
+        macros.elements.map(&:value)
+      end
+    }
+  end
+
+  rule macro
+    "MACRO"
+    spaces type:integer
+    spaces id:integer
+    spaces loop_index:integer
+    spaces release_index:integer
+    spaces arpeggio_type:integer
+    spaces ":"
+    values:(spaces integer)+
+    linebreak
+    {
+      def value
+        FamitrackerParser::Macro.new.tap do |macro|
+          macro.type = type.value
+          macro.id = id.value
+          macro.loop_index = loop_index.value
+          macro.release_index = release_index.value
+          macro.arpeggio_type = arpeggio_type.value
+          macro.values = values.elements.map(&:integer).map(&:value)
         end
       end
     }
