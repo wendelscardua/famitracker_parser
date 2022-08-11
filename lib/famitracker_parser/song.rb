@@ -21,6 +21,14 @@ module FamitrackerParser
   end
 
   class GlobalSettings
+    EXPANSIONS = [
+      [1, "Konami VRC6"],
+      [2, "Konami VRC7"],
+      [4, "Nintendo FDS sound"],
+      [8, "Nintendo MMC5"],
+      [16, "Namco 163"]
+    ].freeze
+
     attr_accessor :machine,
                   :framerate,
                   :expansion,
@@ -29,13 +37,11 @@ module FamitrackerParser
                   :n163_channels
 
     def expansion_description
-      case @expansion
-      when 0 then "NES channels only"
-      when 1 then "Konami VRC6"
-      when 2 then "Konami VRC7"
-      when 4 then "Nintendo FDS sound"
-      when 8 then "Nintendo MMC5"
-      when 16 then "Namco 163"
+      if @expansion == 0
+        ["NES channels only"]
+      else
+        EXPANSIONS.reject { |(key, _value)| (@expansion & key) == 0 }
+                  .map { |_key, value| value }
       end
     end
 
