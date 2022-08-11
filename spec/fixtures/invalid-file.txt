@@ -1,0 +1,7 @@
+# FamiTracker text export 4.1.3
+
+# Song information
+
+Sorry, but the real export file is in another castle
+
+# End of export

@@ -273,10 +273,98 @@ grammar FamitrackerTextGrammar
   end
 
   rule row
-    "ROW" spaces id:hexadecimal_byte [^\r\n]* linebreak
+    "ROW"
+    spaces id:hexadecimal_byte
+    row_channels:(" : " row_channel)+
+    linebreak
     {
       def value
-        text_value
+        FamitrackerParser::Row.new.tap do |row|
+          row.id = id.value
+          row.channels = row_channels.elements.map(&:row_channel).map(&:value)
+        end
+      end
+    }
+  end
+
+  rule row_channel
+    note_octave " " rc_instrument " " volume effects:(" " effect)+
+    {
+      def value
+        FamitrackerParser::RowChannel.new.tap do |row_channel|
+          row_channel.note_octave = note_octave.value
+          row_channel.instrument = rc_instrument.value
+          row_channel.volume = volume.value
+          row_channel.effects = effects.elements.map(&:effect).map(&:value)
+        end
+      end
+    }
+  end
+
+  rule note_octave
+    (
+      "..."
+      /
+      "---"
+      /
+      "==="
+      /
+      [0-9ABCDEFG] [-#] [0-9#]
+    )
+    {
+      def value
+        text_value == "..." ? nil : text_value
+      end
+    }
+  end
+
+  rule rc_instrument
+    byte:hexadecimal_byte
+    {
+      def value
+        byte.value
+      end
+    }
+    /
+    ".."
+    {
+      def value
+        nil
+      end
+    }
+  end
+
+  rule volume
+    nibble:hexadecimal_nibble
+    {
+      def value
+        nibble.value
+      end
+    }
+    /
+    "."
+    {
+      def value
+        nil
+      end
+    }
+  end
+
+  rule effect
+    "..."
+    {
+      def value
+        nil
+      end
+    }
+    /
+    (command:[0-9A-Z] argument:hexadecimal_byte)
+    {
+      def value
+        FamitrackerParser::Effect.new.tap do |effect|
+          effect.command = command.text_value
+          effect.argument = argument.value
+        end
       end
     }
   end
@@ -309,6 +397,15 @@ grammar FamitrackerTextGrammar
 
   rule hexadecimal_byte
     [0-9A-F] [0-9A-F]
+    {
+      def value
+        text_value.to_i(16)
+      end
+    }
+  end
+
+  rule hexadecimal_nibble
+    [0-9A-F]
     {
       def value
         text_value.to_i(16)

@@ -25,13 +25,10 @@ module FamitrackerParser
     def failure
       @grammar_parser.failure_reason
     end
-  end
 
-  def self.playground
-    content = File.open("spec/fixtures/2a03-example.txt", "r:iso-8859-1:utf-8", &:read)
-    parser = Parser.new(content)
-    result = parser.parse!
-    require "pry"
-    binding.pry
+    def self.parse_file!(path)
+      content = File.open(path, "r:iso-8859-1:utf-8", &:read)
+      Parser.new(content).parse!
+    end
   end
 end
