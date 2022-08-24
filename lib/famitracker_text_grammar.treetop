@@ -170,7 +170,7 @@ grammar FamitrackerTextGrammar
 
   rule instruments
     "# Instruments" linebreak
-    instruments:(instrument)*
+    instruments:(instrument_2a03 / instruments_vrc7)*
     {
       def value
         instruments.elements.map(&:value)
@@ -178,8 +178,8 @@ grammar FamitrackerTextGrammar
     }
   end
 
-  rule instrument
-    type:("INST2A03")
+  rule instrument_2a03
+    "INST2A03"
     spaces id:integer
     spaces volume_macro:integer
     spaces arpeggio_macro:integer
@@ -191,8 +191,7 @@ grammar FamitrackerTextGrammar
     dpcm_keys:(dpcm_keys)*
     {
       def value
-        FamitrackerParser::Instrument.new.tap do |instrument|
-          instrument.type = type.text_value
+        FamitrackerParser::Instrument2A03.new.tap do |instrument|
           instrument.id = id.value
           instrument.volume_macro = volume_macro.value
           instrument.arpeggio_macro = arpeggio_macro.value
@@ -201,6 +200,23 @@ grammar FamitrackerTextGrammar
           instrument.duty_noise_macro = duty_noise_macro.value
           instrument.name = name.value
           instrument.dpcm_keys = dpcm_keys.elements.map(&:value)
+        end
+      end
+    }
+  end
+
+  rule instruments_vrc7
+    "INSTVRC7"
+    spaces id:integer
+    spaces patch:integer
+    patch_registers:(spaces register:hexadecimal_byte)+ spaces name:string
+    linebreak
+    {
+      def value
+        FamitrackerParser::InstrumentVRC7.new.tap do |instrument|
+          instrument.id = id.value
+          instrument.patch = patch.value
+          instrument.patch_registers = patch_registers.elements.map(&:register).map(&:value)
         end
       end
     }

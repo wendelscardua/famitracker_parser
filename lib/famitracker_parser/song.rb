@@ -89,9 +89,8 @@ module FamitrackerParser
                   :bytes
   end
 
-  class Instrument
-    attr_accessor :type,
-                  :id,
+  class Instrument2A03
+    attr_accessor :id,
                   :volume_macro,
                   :arpeggio_macro,
                   :pitch_macro,
@@ -99,6 +98,12 @@ module FamitrackerParser
                   :duty_noise_macro,
                   :name,
                   :dpcm_keys
+  end
+
+  class InstrumentVRC7
+    attr_accessor :id,
+                  :patch,
+                  :patch_registers
   end
 
   class DPCMKey
