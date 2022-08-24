@@ -8,6 +8,8 @@ grammar FamitrackerTextGrammar
     global_settings linebreak
     macros linebreak
     dpcm_samples linebreak
+    (dn_detune_settings linebreak)?
+    (dn_grooves linebreak)?
     instruments linebreak
     tracks
     "# End of export"
@@ -148,6 +150,22 @@ grammar FamitrackerTextGrammar
         end
       end
     }
+  end
+
+  # Dn-Famitracker specific settings
+  # (TODO)
+  rule dn_detune_settings
+    "# Detune settings" linebreak
+  end
+
+  # Dn-Famitracker grooves
+  # (TODO)
+  rule dn_grooves
+    "# Grooves" linebreak
+    ("GROOVE" spaces integer spaces integer spaces ":" values:(spaces value:integer)+ linebreak)+
+    linebreak
+    "# Tracks using default groove" linebreak
+    "USEGROOVE" spaces ":" default_tracks:(spaces track:integer)+ linebreak
   end
 
   rule instruments
