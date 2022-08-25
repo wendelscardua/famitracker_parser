@@ -4,7 +4,7 @@ module FamitrackerParser
   class Song
     attr_accessor :export_description,
                   :song_information,
-                  :song_comment,
+                  :song_comments,
                   :global_settings,
                   :macros,
                   :dpcm_samples,
@@ -112,7 +112,8 @@ module FamitrackerParser
                   :dpcm_sample_id,
                   :pitch,
                   :loop,
-                  :d_counter
+                  :loop_point,
+                  :delta_counter
   end
 
   class Track
