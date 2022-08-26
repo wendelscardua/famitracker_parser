@@ -27,6 +27,7 @@ module FamitrackerParser
       song.dpcm_samples = []
       song.instruments = []
       song.tracks = []
+      song.extras = {}
 
       @source.lines.map(&:chomp).each.with_index do |line, line_number|
         @current_line = line_number + 1
@@ -252,6 +253,28 @@ module FamitrackerParser
                 end
               end
             end
+          ### Dn-Famitracker
+          # Grooves
+          when "GROOVE"
+            dn_famitracker_extras = (song.extras[:dn_famitracker] ||= {})
+            (dn_famitracker_extras[:grooves] ||= []) << Groove.new.tap do |groove|
+              parsed = parse_args(args, {
+                                    id: :decimal,
+                                    size: :decimal,
+                                    separator: ":",
+                                    groove: { array: :decimal }
+                                  })
+              groove.id = parsed[:id]
+              groove.groove = parsed[:groove]
+            end
+          # Tracks using default groove
+          when "USEGROOVE"
+            dn_famitracker_extras = (song.extras[:dn_famitracker] ||= {})
+            parsed = parse_args(args, {
+                                  separator: ":",
+                                  tracks: { array: :decimal }
+                                })
+            dn_famitracker_extras[:default_groove_tracks] = parsed[:tracks]
           else
             raise ParserError, "Unknown command '#{command}' at line #{@current_line}"
           end

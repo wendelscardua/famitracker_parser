@@ -9,7 +9,8 @@ module FamitrackerParser
                   :macros,
                   :dpcm_samples,
                   :instruments,
-                  :tracks
+                  :tracks,
+                  :extras
   end
 
   class ExportDescription
@@ -103,7 +104,8 @@ module FamitrackerParser
   class InstrumentVRC7
     attr_accessor :id,
                   :patch,
-                  :patch_registers
+                  :patch_registers,
+                  :name
   end
 
   class DPCMKey
