@@ -1,8 +1,6 @@
 # FamitrackerParser
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/famitracker_parser`. To experiment with that code, run `bin/console` for an interactive prompt.
-
-TODO: Delete this and the text above, and describe your gem
+A ruby parser for text files exported from FamiTracker (and its forks)
 
 ## Installation
 
@@ -22,7 +20,12 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+```ruby
+  require 'famitracker_parser'
+  song = FamiTrackerParser::Parser.parse_file! 'my-exported-song.txt'
+  puts "This is #{song.song_information.title} by #{song.song_information.author}"
+  puts "These are the DPCM samples: #{song.dpcm_samples.map(&:name).join(', ')}"
+```
 
 ## Development
 
@@ -32,7 +35,7 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/famitracker_parser. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [code of conduct](https://github.com/[USERNAME]/famitracker_parser/blob/master/CODE_OF_CONDUCT.md).
+Bug reports and pull requests are welcome on GitHub at https://github.com/wendelscardua/famitracker_parser. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [code of conduct](https://github.com/wendelscardua/famitracker_parser/blob/master/CODE_OF_CONDUCT.md).
 
 ## License
 
@@ -40,4 +43,4 @@ The gem is available as open source under the terms of the [MIT License](https:/
 
 ## Code of Conduct
 
-Everyone interacting in the FamitrackerParser project's codebases, issue trackers, chat rooms and mailing lists is expected to follow the [code of conduct](https://github.com/[USERNAME]/famitracker_parser/blob/master/CODE_OF_CONDUCT.md).
+Everyone interacting in the FamitrackerParser project's codebases, issue trackers, chat rooms and mailing lists is expected to follow the [code of conduct](https://github.com/wendelscardua/famitracker_parser/blob/master/CODE_OF_CONDUCT.md).
