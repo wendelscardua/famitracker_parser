@@ -152,6 +152,26 @@ module FamitrackerParser
               dpcm_key.loop_point = parsed[:loop_point]
               dpcm_key.delta_counter = parsed[:delta_counter]
             end
+          when "INSTVRC7"
+            parsed = parse_args(args, {
+                                  id: :decimal,
+                                  patch: :decimal,
+                                  r0: :hexadecimal,
+                                  r1: :hexadecimal,
+                                  r2: :hexadecimal,
+                                  r3: :hexadecimal,
+                                  r4: :hexadecimal,
+                                  r5: :hexadecimal,
+                                  r6: :hexadecimal,
+                                  r7: :hexadecimal,
+                                  name: :string
+                                })
+            song.instruments << InstrumentVRC7.new.tap do |instrument|
+              instrument.id = parsed[:id]
+              instrument.patch = parsed[:patch]
+              instrument.patch_registers = %i[r0 r1 r2 r3 r4 r5 r6 r7].map { |r| parsed[r] }
+              instrument.name = parsed[:name]
+            end
           # Tracks
           when "TRACK"
             parsed = parse_args(args,
