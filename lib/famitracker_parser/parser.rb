@@ -1,16 +1,9 @@
 # frozen_string_literal: true
 
 require_relative "song"
+require_relative "row_channel"
 
 module FamitrackerParser
-  NOTE_OCTAVE_REGEX = /(?:\.\.\.|---|===|[0-9ABCDEFG][-#][0-9#])/.freeze
-  EFFECT_REGEX = /(\.\.\.|[0-9A-Z][0-9A-F][0-9A-F])/.freeze
-  ROW_CHANNEL_REGEX = /:
-                        \s(?<note_octave>#{NOTE_OCTAVE_REGEX})
-                        \s(?<instrument>[.0-9A-F]{2})
-                        \s(?<volume>[.0-9A-F])
-                        \s(?<effects>#{EFFECT_REGEX}(?:\s#{EFFECT_REGEX})*)/x.freeze
-
   # The Parser itself
   class Parser
     def initialize(source)
@@ -212,46 +205,7 @@ module FamitrackerParser
                                 })
             song.tracks.last.patterns.last.rows << Row.new.tap do |row|
               row.id = parsed[:id]
-              row_channel_data = parsed[:rest].scan(ROW_CHANNEL_REGEX)
-                                              .map { |match| ROW_CHANNEL_REGEX.names.zip(match).to_h }
-              row.channels = row_channel_data.map do |row_channel_match|
-                RowChannel.new.tap do |row_channel|
-                  row_channel.note_octave = row_channel_match["note_octave"].then do |note_octave|
-                    case note_octave
-                    when "..." then nil
-                    when "---" then :halt
-                    when "===" then :release
-                    else note_octave
-                    end
-                  end
-                  row_channel.instrument = row_channel_match["instrument"].then do |instrument|
-                    if instrument == ".."
-                      nil
-                    else
-                      instrument.to_i(16)
-                    end
-                  end
-                  row_channel.volume = row_channel_match["volume"].then do |volume|
-                    if volume == "."
-                      nil
-                    else
-                      volume.to_i(16)
-                    end
-                  end
-                  row_channel.effects = row_channel_match["effects"].then do |effects|
-                    effects.scan(EFFECT_REGEX).map do |(effect_match)|
-                      if effect_match == "..."
-                        nil
-                      else
-                        Effect.new.tap do |effect|
-                          effect.command = effect_match[0]
-                          effect.argument = effect_match[1..]
-                        end
-                      end
-                    end
-                  end
-                end
-              end
+              row.channels = RowChannel.parse_all(parsed[:rest])
             end
           ### Dn-Famitracker
           # Grooves

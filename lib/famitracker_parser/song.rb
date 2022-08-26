@@ -136,15 +136,4 @@ module FamitrackerParser
     attr_accessor :id,
                   :channels
   end
-
-  class RowChannel
-    attr_accessor :note_octave,
-                  :instrument,
-                  :volume,
-                  :effects
-  end
-
-  class Effect
-    attr_accessor :command, :argument
-  end
 end
